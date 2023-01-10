@@ -15,5 +15,5 @@ jobs:
     
       - name: Run tests
         run: |
-          source script
+          cd script
           python main.py 1 2
