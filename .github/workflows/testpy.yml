@@ -15,4 +15,4 @@ jobs:
     
       - name: Run tests
         run: |
-          python ${{ github.workspace }}/script/main.py 1 2
+          python /home/runner/work/TP_Github_Action/script/main.py 1 2
