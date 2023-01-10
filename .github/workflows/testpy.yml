@@ -15,4 +15,5 @@ jobs:
     
       - name: Run tests
         run: |
+	    pwd
           python main.py 1 2
