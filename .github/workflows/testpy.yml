@@ -1,0 +1,19 @@
+name: GitHub Actions Demo
+on: [push]
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+  
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.8
+    
+      - name: Run tests
+        run: |
+          source venv/bin/activate
+          python script/main.py 1 2
