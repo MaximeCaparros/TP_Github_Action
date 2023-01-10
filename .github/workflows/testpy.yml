@@ -15,5 +15,4 @@ jobs:
     
       - name: Run tests
         run: |
-	    pwd
-          python main.py 1 2
+          python {{ github.workspace }}/script/main.py 1 2
