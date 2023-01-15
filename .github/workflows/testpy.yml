@@ -6,13 +6,12 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
   
       - name: Set up Python
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@v4
         with:
-          python-version: 3.8
+          python-version: '3.10'
     
-      - name: Run tests
-        run: |
-          python /home/runner/work/TP_Github_Action/script/main.py 1 2
+      - name: Run Python unit tests
+        run: python3 -u -m unittest test/main.py
