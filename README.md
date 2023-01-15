@@ -86,7 +86,7 @@ Et enfin on lance les test avec `pytest test/main.py`.
 
 fichier main.py :
 
-```
+```python 3
 import unittest
 
 class SimpleMath:
@@ -108,4 +108,129 @@ class TestSimpleMath(unittest.TestCase):
 ```
 
 On peut voir la fonction soustraction et test_soustraction ajouté.
+
+Dans le workflow on peut voir que les deux test sont passé :
+
+```sh
+============================= test session starts ==============================
+platform linux -- Python 3.10.9, pytest-7.2.1, pluggy-1.0.0
+rootdir: /home/runner/work/TP_Github_Action/TP_Github_Action
+plugins: cov-4.0.0
+collected 2 items
+
+test/main.py ..                                                          [100%]
+
+============================== 2 passed in 0.02s ===============================
+```
+
+#### 6. Ajout de pylint dans le Workflow
+
+Voici l'ajout de pylint dans le workflow: 
+
+```yml
+      - name: Analyse avec pylint
+        run: |
+          pip install pylint
+          find . -name '*.py' -exec pylint {} \;
+```
+
+On installe pylint puis on cherche tout les fichiers `*.py` et on lance pylint sur ces fichiers.
+
+Execution dans le workflow :
+```sh
+************* Module main
+test/main.py:1:0: C0114: Missing module docstring (missing-module-docstring)
+test/main.py:3:0: C0115: Missing class docstring (missing-class-docstring)
+test/main.py:5:4: C0116: Missing function or method docstring (missing-function-docstring)
+test/main.py:5:17: C0103: Argument name "a" doesn't conform to snake_case naming style (invalid-name)
+test/main.py:5:20: C0103: Argument name "b" doesn't conform to snake_case naming style (invalid-name)
+test/main.py:7:4: C0116: Missing function or method docstring (missing-function-docstring)
+test/main.py:7:21: C0103: Argument name "a" doesn't conform to snake_case naming style (invalid-name)
+test/main.py:7:24: C0103: Argument name "b" doesn't conform to snake_case naming style (invalid-name)
+test/main.py:7:4: E0213: Method 'soustraction' should have "self" as first argument (no-self-argument)
+test/main.py:10:0: C0115: Missing class docstring (missing-class-docstring)
+test/main.py:11:4: C0116: Missing function or method docstring (missing-function-docstring)
+test/main.py:14:4: C0116: Missing function or method docstring (missing-function-docstring)
+
+-----------------------------------
+Your code has been rated at 0.00/10
+
+```
+0/10 :(
+
+7. Docker
+
+
+On créer un Dockerfile a la racine :
+
+```Dockerfile
+# Container image that runs your code
+FROM alpine:3.10
+
+# Copies your code file from your action repository to the filesystem path `/` of the container
+COPY entrypoint.sh /entrypoint.sh
+
+# Code file to execute when the docker container starts up (`entrypoint.sh`)
+ENTRYPOINT ["/entrypoint.sh"]
+```
+
+Ce dockerfile va utiliser l'image alpine:3.10 en utilisant entrypoint.sh qui est un script permettant de faire un hello-world :
+
+entrypoint.sh
+
+```sh
+#!/bin/sh -l
+
+echo "Hello $1"
+time=$(date)
+echo "time=$time" >> $GITHUB_OUTPUT
+```
+On créer ensuite un fichier action.yml dans le dossier actions/
+
+action.yml
+```yml
+# actionDocker.yml
+name: 'Hello World'
+description: 'Greet someone and record the time'
+inputs:
+who-to-greet:  # id of input
+description: 'Who to greet'
+required: true
+default: 'World'
+outputs:
+time: # id of output
+description: 'The time we greeted you'
+runs:
+using: 'docker'
+image: 'Dockerfile'
+args:
+- ${{ inputs.who-to-greet }}
+```
+
+
+Ce fichier action.yml va permettre de définir les parametres input et output a donné au container Docker.
+
+
+On va créer ensuite un workflow testDocker.yml :
+
+```yml
+on: [push]
+
+jobs:
+  hello_world_job:
+    runs-on: ubuntu-latest
+    name: A job to say hello
+    steps:
+      - name: Hello world action step
+        id: hello
+        uses: actions/checkout@v3
+        with:
+          who-to-greet: 'Mona the Octocat'
+      # Use the output from the `hello` step
+      - name: Get the output time
+        run: echo "The time was ${{ steps.hello.outputs.time }}"
+        
+```
+On affecte les variable input avec `with` dans `- name: Hello world action step` et on utilise l'action précedent avec les bon paramètres d'input.
+Ensuite on affiche le time avec la valeur output de l'action.yml.
 
