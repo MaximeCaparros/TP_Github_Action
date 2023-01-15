@@ -18,3 +18,7 @@ jobs:
           pip install pytest
           pip install pytest-cov
           pytest test/main.py
+      - name: Analyse avec pylint
+        run: |
+          pip install pylint
+          find . -name '*.py' -exec pylint {} \;
