@@ -30,7 +30,3 @@ jobs:
 ```
 
 Le resultat se trouve dans l'onglet Action et ensuite le workflow que vous voulez voir.
-
-Exemple de résultat :
-
-![img.png](img.png)
