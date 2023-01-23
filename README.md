@@ -181,34 +181,10 @@ entrypoint.sh
 ```sh
 #!/bin/sh -l
 
-echo "Hello $1"
-time=$(date)
-echo "time=$time" >> $GITHUB_OUTPUT
+pip install pytest
+pip install pytest-cov
+pytest test/main.py
 ```
-On créer ensuite un fichier action.yml dans le dossier actions/
-
-action.yml
-```yml
-# actionDocker.yml
-name: 'Hello World'
-description: 'Greet someone and record the time'
-inputs:
-who-to-greet:  # id of input
-description: 'Who to greet'
-required: true
-default: 'World'
-outputs:
-time: # id of output
-description: 'The time we greeted you'
-runs:
-using: 'docker'
-image: 'Dockerfile'
-args:
-- ${{ inputs.who-to-greet }}
-```
-
-
-Ce fichier action.yml va permettre de définir les parametres input et output a donné au container Docker.
 
 
 On va créer ensuite un workflow testDocker.yml :
@@ -218,19 +194,13 @@ on: [push]
 
 jobs:
   hello_world_job:
-    runs-on: ubuntu-latest
-    name: A job to say hello
-    steps:
-      - name: Hello world action step
-        id: hello
-        uses: actions/checkout@v3
-        with:
-          who-to-greet: 'Mona the Octocat'
-      # Use the output from the `hello` step
-      - name: Get the output time
-        run: echo "The time was ${{ steps.hello.outputs.time }}"
+    runs:
+  	using: 'docker'
+  	image: 'Dockerfile'
         
 ```
-On affecte les variable input avec `with` dans `- name: Hello world action step` et on utilise l'action précedent avec les bon paramètres d'input.
-Ensuite on affiche le time avec la valeur output de l'action.yml.
+
+Ce workflow va permettre de build l'image dans DockerFile.
+
+
 
